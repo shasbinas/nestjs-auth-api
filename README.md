@@ -6,22 +6,24 @@
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
-A production-ready **Authentication API** built with **NestJS**, featuring secure user registration with image uploads to **AWS S3**, **JWT-based authentication**, and **MongoDB** for persistence.
+A production-ready **NestJS Authentication API** featuring secure **JWT-based** login/registration, **AWS S3** integration for profile image uploads, and **MongoDB** persistence. Built with a focus on security, it implements **Joi validation** with custom error messaging, **BCrypt** password hashing, **Helmet** headers, and **Rate-Limiting** to ensure top-tier robustness and scalability.
 
 ---
 
 ## 🚀 Features
 
--   **Secure Authentication**: JWT-based login and registration.
--   **File Upload**: Integration with **AWS S3** for profile picture (avatar) uploads.
+-   **Secure Authentication**: JWT-based login and registration using Passport.js.
+-   **File Upload**: Integration with **AWS S3 (SDK v3)** for profile picture (avatar) uploads.
 -   **Database Persistence**: **MongoDB** integration using **Mongoose ODM**.
-- **Security**:
+-   **Strict Validation**:
+    -   **Joi Schema Validation**: Custom pipes for strict request body enforcement.
+    -   **User-Friendly Errors**: Descriptive, non-technical error messages for end-users.
+-   **Advanced Security**:
     -   **Helmet**: Security-oriented HTTP headers.
-    -   Password hashing using **bcrypt**.
-    -   Protected routes via **JWT Guards**.
-    -   **Rate limiting** (Throttling) to prevent brute-force attacks.
-    -   Environment variable management.
--   **Scalable Architecture**: Clean and modular NestJS structure.
+    -   **BCrypt**: Industry-standard password hashing.
+    -   **JWT Guards**: Protecting private routes with token-based access control.
+    -   **Rate Limiting**: Throttling to prevent brute-force attacks (10 req/min).
+-   **Scalable Architecture**: Modular NestJS structure with clear separation of concerns.
 
 ---
 
@@ -30,9 +32,10 @@ A production-ready **Authentication API** built with **NestJS**, featuring secur
 -   **Backend**: NestJS (v11.x)
 -   **Database**: MongoDB Atlas
 -   **File Storage**: Amazon S3
--   **Auth**: Passport.js & JWT
--   **Validation**: Class-validator & Class-transformer
--   **Infrastructure**: AWS SDK v3
+-   **Auth**: Passport.js & JWT (JSON Web Tokens)
+-   **Validation**: **Joi** (Schema-based) & Class-validator
+-   **Security**: Helmet, BCryptJS
+-   **Infrastructure**: AWS SDK v3 for Node.js
 
 ---
 
@@ -53,7 +56,7 @@ Create a `.env` file in the root directory and add the following:
 ```env
 # MongoDB Configuration
 MONGO_URI=your_mongodb_connection_uri
-DB_NAME=your_database_name
+DB_NAME=nestjs_auth_db
 
 # AWS S3 Configuration
 AWS_REGION=your_aws_region
@@ -108,7 +111,7 @@ The server will be running on `http://localhost:3000`.
 -   `POST /auth/login`: Authenticate a user and receive a JWT token.
 
 ### User Module
--   `GET /users/profile`: Retrieve the currently logged-in user's details. **(Requires JWT Token)**
+-   `GET /users/profile`: Retrieve the currently logged-in user's details. **(Requires Bearer Token)**
 
 ---
 
@@ -116,19 +119,19 @@ The server will be running on `http://localhost:3000`.
 
 ```bash
 src/
-├── auth/            # Authentication logic & S3 service
-├── users/           # User management & Mongoose schemas
-├── app.module.ts    # Main application module
-└── main.ts         # Application entry point
+├── auth/            # Auth logic, JWT strategy, S3 service & Joi schemas
+├── users/           # User management, Mongoose schemas & services
+├── app.module.ts    # Main application module (Config, Database, Throttler)
+└── main.ts         # Application entry point & Global middleware
 ```
 
 ---
 
-## 🛡 Security
+## 🛡 Security Enhancements
 
--   **Rate Limiting**: Configured to allow 10 requests per 60 seconds per IP.
--   **Validations**: All incoming data is validated using `ValidationPipe`.
--   **CORS**: Enabled for cross-origin requests.
+-   **Custom Validation Pipes**: Integrated Joi to provide detailed feedback during registration/login.
+-   **Throttler**: Configured to allow 10 requests per 60 seconds per IP to mitigate DoS/Brute-force.
+-   **Helmet & CORS**: Pre-configured to handle secure headers and restrict cross-origin access in production.
 
 ---
 
